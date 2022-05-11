@@ -13,6 +13,7 @@ import datetime
 if __name__ == "__getactivity__":
     pass
 
+#function for get all activity data
 def getactivity(start_date , end_date) :
     CLIENT_ID='2389G5'
     CLIENT_SECRET='636c18786967602847f7396da3456f41'
@@ -20,7 +21,8 @@ def getactivity(start_date , end_date) :
     def daterange(start_date, end_date):
         for n in range(int ((end_date - start_date).days)):
             yield start_date + timedelta(n)
-
+    
+    #autorization proccess
     server=Oauth2.OAuth2Server(CLIENT_ID, CLIENT_SECRET)
     server.browser_authorize()
     ACCESS_TOKEN=str(server.fitbit.client.session.token['access_token'])
@@ -29,17 +31,15 @@ def getactivity(start_date , end_date) :
 
     #-------------------------------------------------------------------------------------------------------------
 
-    #start_date = datetime.datetime(2021, 9, 10)
-    #end_date = datetime.datetime(2022, 1, 29)
+    #count for the date-range
     day_count = 0
 
     date_list = []
 
+    #crate a list with all the data and update the count
     for single_date in daterange(start_date, end_date):
         date_list.append(single_date.strftime("%Y-%m-%d"))
         day_count +=1
-
-    #ora devo inserire nel csv le liste colonna per colonna
 
     #-------------------------------------------------------------------------------------------------------------
     #1 : activityCalories
@@ -47,13 +47,11 @@ def getactivity(start_date , end_date) :
     data_dump = json.dumps(activities_calories['activities-activityCalories'])
     info = json.loads(data_dump)
 
-    #salvo i valori in una lista
+    #add the data to a list
     list_activityCalories = []
 
     for i in range(day_count): 
         list_activityCalories.append(info[i]['value'])
-
-    #ora devo inserire nel csv le liste colonna per colonna
 
     #-------------------------------------------------------------------------------------------------------------
     #2 : calories : The top level time series for calories burned inclusive of BMR, tracked activity, and manually logged activities.
@@ -61,7 +59,7 @@ def getactivity(start_date , end_date) :
     data_dump = json.dumps(activities_calories['activities-calories'])
     info = json.loads(data_dump)
 
-    #salvo i valori in una lista
+     #add the data to a list
     list_calories = []
 
     for i in range(day_count): 
@@ -73,7 +71,7 @@ def getactivity(start_date , end_date) :
     data_dump = json.dumps(activities_calories['activities-caloriesBMR'])
     info = json.loads(data_dump)
 
-    #salvo i valori in una lista
+     #add the data to a list
     list_caloriesBMR = []
 
     for i in range(day_count): 
@@ -85,7 +83,7 @@ def getactivity(start_date , end_date) :
     data_dump = json.dumps(activities_calories['activities-distance'])
     info = json.loads(data_dump)
 
-    #salvo i valori in una lista
+    #add the data to a list
     list_distance = []
 
     for i in range(day_count): 
@@ -97,7 +95,7 @@ def getactivity(start_date , end_date) :
     data_dump = json.dumps(activities_calories['activities-minutesSedentary'])
     info = json.loads(data_dump)
 
-    #salvo i valori in una lista
+     #add the data to a list
     list_minutesSedentary = []
 
     for i in range(day_count): 
@@ -109,7 +107,7 @@ def getactivity(start_date , end_date) :
     data_dump = json.dumps(activities_calories['activities-minutesLightlyActive'])
     info = json.loads(data_dump)
 
-    #salvo i valori in una lista
+     #add the data to a list
     list_minutesLightlyActive = []
 
     for i in range(day_count): 
@@ -121,7 +119,7 @@ def getactivity(start_date , end_date) :
     data_dump = json.dumps(activities_calories['activities-minutesFairlyActive'])
     info = json.loads(data_dump)
 
-    #salvo i valori in una lista
+     #add the data to a list
     list_minutesFairlyActive = []
 
     for i in range(day_count): 
@@ -133,7 +131,7 @@ def getactivity(start_date , end_date) :
     data_dump = json.dumps(activities_calories['activities-minutesVeryActive'])
     info = json.loads(data_dump)
 
-    #salvo i valori in una lista
+     #add the data to a list
     list_minutesVeryActive = []
 
     for i in range(day_count): 
@@ -145,17 +143,18 @@ def getactivity(start_date , end_date) :
     data_dump = json.dumps(activities_calories['activities-steps'])
     info = json.loads(data_dump)
 
-    #salvo i valori in una lista
+    #add the data to a list
     list_steps = []
 
     for i in range(day_count): 
         list_steps.append(info[i]['value'])
 
     #-------------------------------------------------------------------------------------------------------------
-    #creo un dizionario con le liste e lo trasformo in un csv per essere inserito nel database
+    #creation of a dictionary with all the list
     dict = {'date' : date_list, 'activity-calories' : list_activityCalories, 'calories' : list_calories, 'caloriesBMR' : list_caloriesBMR,
             'distance' : list_distance, 'minutesSedentary' : list_minutesSedentary,'minutesLightlyActive' : list_minutesLightlyActive,
             'minutesFairlyActive' : list_minutesFairlyActive, 'minutesVeryActive' : list_minutesVeryActive,'steps' : list_steps }
     df = pd.DataFrame(dict)
-    #print(df)
+    
+    #dictornary to csv 
     df.to_csv("source/data/activities.csv",index=False)

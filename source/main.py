@@ -6,34 +6,36 @@ import pandas as pd
 import mysql.connector as mysql
 from mysql.connector import Error
  
-
+#user credential 
 user_name =  input("inserisci nome utente : ")
 user_surname =  input("inserisci cognome utente : ")
 user_age =  input("inserisci età dell utente : ")
 
-
+#start date 
 day_inizio = input("inserisci il giorno di inizio : ")
 month_inizio = input("inserisci il mese di inizio : ")
 year_inizio = input("inserisci il anno di inizio : ")
 
+#end date 
 day_fine = input("inserisci il giorno di fine : ")
 month_fine = input("inserisci il mese di fine : ")
 year_fine = input("inserisci il giorno di fine : ")
 
-
+#define start and end date
 start_date = datetime.datetime(int(year_inizio),int(month_inizio),int(day_inizio)).date()
 end_date = datetime.datetime(int(year_fine),int(month_fine),int(day_fine)).date()
 
 print(start_date)
 print(end_date)
 
+#import functions
 import activity
 import sleep
 sleep.getsleep(start_date,end_date)
 activity.getactivity(start_date,end_date)
 
 
-#inserimento dati activity nel database
+#insert activity data in the database
 path = "source\data\\activities.csv"
 with open(path, 'r') as file:
     reader = csv.reader(file)
@@ -50,6 +52,7 @@ with open(path, 'r') as file:
                     cursor.execute("select database();")
                     record = cursor.fetchone()
                     print("You're connected to database: ", record)
+                    #create table if it dosn't exist
                     cursor.execute("""CREATE TABLE IF NOT EXISTS `fitbit`.`activity` (
                                     `id` INT NOT NULL AUTO_INCREMENT,
                                     `user_name` VARCHAR(45) NULL,
@@ -67,7 +70,7 @@ with open(path, 'r') as file:
                                     `steps` INT NULL,
                                     PRIMARY KEY (`id`));""")
 
-                    #eseguo la query per inserire la nuova riga nel database
+                    #execution of the query
                     cursor.execute('INSERT INTO fitbit.activity(user_name,user_surname,user_age, date, activity_calories, calories, caloriesBMR, distance, minutesSedentary, minutesLightlyActive, minutesFairlyActive, minutesVeryActive, steps)''VALUES(%s , %s , %s , %s , %s , %s, %s , %s , %s, %s , %s , %s, %s)',my_list)
                     conn.commit()     
                     
@@ -75,8 +78,7 @@ with open(path, 'r') as file:
                         print("Error while connecting to MySQL", e)
 
 
-#inserimento dati sleep nel database
-
+#insert sleep data in the database
 path = "source\data\\sleep.csv"
 with open(path, 'r') as file:
     reader = csv.reader(file)
@@ -93,6 +95,7 @@ with open(path, 'r') as file:
                     cursor.execute("select database();")
                     record = cursor.fetchone()
                     print("You're connected to database: ", record)
+                    #create table if it dosn't exist
                     cursor.execute("""CREATE TABLE IF NOT EXISTS `fitbit`.`sleep` (
                                     `id_sleep` INT NOT NULL AUTO_INCREMENT,
                                     `user_name` VARCHAR(45) NULL,
@@ -113,7 +116,7 @@ with open(path, 'r') as file:
                                     `timeInBed` INT NULL,
                                     PRIMARY KEY (`id_sleep`));""")
 
-                    #eseguo la query per inserire la nuova riga nel database
+                    #execution of the query
                     cursor.execute('INSERT INTO fitbit.sleep(user_name, user_surname, user_age, date_of_sleep, awakeCount, awakeDuration, awakeningsCount, duration, efficiency, minutesAfterWakeup, minutesAsleep, minutesAwake, minutesToFallAsleep, restlessCount, restlessDuration, timeInBed)''VALUES(%s , %s , %s , %s , %s , %s, %s , %s , %s, %s , %s , %s, %s, %s, %s, %s)',my_list)
                     conn.commit()     
                     
@@ -125,7 +128,7 @@ with open(path, 'r') as file:
 path = "C:\\Users\\aless\\OneDrive\\Desktop\\Tesi_fitbit\\MyFitbitData\\Massimo\\Sleep\\sleep_score.csv"
 print(path)
 
-#apro il csv in lettura 
+#open the csv 
 with open(path, 'r') as file:
     reader = csv.reader(file)
     
@@ -136,7 +139,7 @@ with open(path, 'r') as file:
             list_row = row
             my_list= list_user + list_row
 
-            #connessione al database
+            #database connection
             try:
                 conn = mysql.connect(host='localhost', database='fitbit', user='root', password='Progetto.fitbit22')
                 if conn.is_connected():
